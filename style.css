@@ -1,0 +1,543 @@
+:root {
+    --bg-image: url('assets/bg.jpg'); 
+    --grid-color: rgba(0, 51, 102, 0.15); 
+    --text-color: #003366;
+    --ink-color: #003366;
+    --panel-bg: rgba(255, 255, 255, 0.5); 
+}
+
+body.dark-mode {
+    --bg-image: url('assets/bg_dark.jpg'); 
+    --grid-color: rgba(255, 255, 255, 0.1); 
+    --text-color: #ffffff;
+    --ink-color: #00ccff;
+    --panel-bg: rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0; padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900; font-size: 22px; 
+    overflow: hidden;
+    color: var(--text-color);
+    transition: color 0.5s ease;
+}
+
+.notebook-page {
+    width: 100vw; height: 100vh;
+    background-color: #fff;
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+        var(--bg-image);
+    background-size: 35px 35px, 35px 35px, cover; 
+    background-position: center; background-attachment: fixed;
+    transition: background-image 0.5s ease;
+    display: flex; flex-direction: column;
+}
+
+#screen-selection {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    height: 100%;
+}
+
+.selection-grid {
+    display: flex; gap: 40px; margin-top: 50px;
+    justify-content: center; align-items: center;
+}
+
+.card {
+    border: 4px solid var(--ink-color); padding: 30px;
+    background: var(--panel-bg); cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center; min-width: 250px;
+}
+
+.card:hover {
+    transform: scale(1.1); box-shadow: 10px 10px 0 var(--ink-color);
+}
+
+.layout-3-col {
+    display: flex; justify-content: space-between;
+    height: 100%; padding: 20px;
+}
+
+.panel {
+    width: 310px; background: var(--panel-bg);
+    border: 4px solid var(--ink-color); padding: 15px;
+    display: flex; flex-direction: column;
+    backdrop-filter: blur(2px); overflow: hidden;
+}
+
+.center-panel {
+    flex-grow: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+}
+
+.handwritten { font-size: 3.5rem; margin: 10px 0; }
+.panel .handwritten { font-size: 2.5rem; text-align: center; }
+
+.sketch-btn {
+    background: transparent; border: 4px solid var(--ink-color);
+    color: var(--text-color); padding: 15px; margin: 10px 0;
+    font-family: inherit; font-weight: 900; font-size: 1.3rem;
+    cursor: pointer; box-shadow: 5px 5px 0 var(--ink-color);
+    transition: 0.1s; width: 100%;
+}
+
+.sketch-btn:active:not(:disabled) {
+    transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink-color);
+}
+.sketch-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+#btn-achievements {
+    padding: 30px 10px; font-size: 1.8rem; margin-top: auto; 
+    background: rgba(255, 215, 0, 0.1); border-width: 6px;
+}
+
+.sketch.large { max-height: 400px; filter: drop-shadow(8px 8px 0px rgba(0,0,0,0.2)); }
+.hidden { display: none !important; }
+.mt-10 { margin-top: 20px; }
+.lang-switcher { display: flex; gap: 10px; }
+.sketch-btn.mini { padding: 5px; font-size: 1rem; flex: 1; }
+
+/* ОКНО ДОСТИЖЕНИЙ */
+.draggable-window {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; min-height: 400px;
+    background: #fff; border: 6px solid var(--ink-color);
+    box-shadow: 15px 15px 0 var(--ink-color);
+    z-index: 9999; display: flex; flex-direction: column;
+}
+
+body.dark-mode .draggable-window { background: #1a1a1a; }
+
+.window-header {
+    padding: 15px 20px; background: var(--ink-color);
+    color: #fff; cursor: move; display: flex;
+    justify-content: space-between; align-items: center;
+    font-size: 1.8rem;
+}
+.close-btn { background: none; border: none; color: white; font-weight: 900; cursor: pointer; }
+
+/* Скролл контента */
+.window-content {
+    padding: 30px; 
+    max-height: 350px; /* Уменьшили, чтобы скролл появлялся раньше */
+    overflow-y: auto; overflow-x: hidden;
+}
+.window-content::-webkit-scrollbar { width: 12px; }
+.window-content::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); }
+.window-content::-webkit-scrollbar-thumb { background: var(--ink-color); border-radius: 6px; }
+
+/* КАРТОЧКИ ДОСТИЖЕНИЙ */
+#achievements-list { display: flex; flex-direction: column; gap: 20px; }
+
+.achievement-card {
+    border: 3px solid var(--ink-color); padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.achievement-card.completed {
+    background: rgba(46, 204, 113, 0.1); 
+    border-style: solid;
+}
+.achievement-card.locked { opacity: 0.6; border-style: dashed; }
+
+.ach-title { font-size: 1.5rem; display: block; }
+.ach-desc { font-size: 1rem; opacity: 0.8; }
+
+.ach-progress-container { margin-top: 5px; }
+.ach-progress-text { font-size: 0.9rem; text-align: right; margin-bottom: 5px; }
+.ach-progress-bar {
+    width: 100%; height: 12px; border: 2px solid var(--ink-color); position: relative;
+}
+.ach-progress-fill { height: 100%; background: var(--ink-color); transition: width 0.5s ease-out; }
+.completed .ach-progress-fill { background: #2ecc71; }
+
+/* Твои старые стили остаются без изменений... */
+
+.inv-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.small { font-size: 1.2rem !important; margin-bottom: 10px; }
+
+.equip-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 60px);
+    gap: 10px;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    gap: 10px;
+}
+
+.slot {
+    width: 60px;
+    height: 60px;
+    border: 2px dashed var(--ink-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    text-align: center;
+    background: rgba(0,0,0,0.03);
+}
+
+.equip-slot { border-style: solid; }
+
+/* Драг-энд-дроп для окон */
+.draggable-window {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--panel-bg);
+    border: 4px solid var(--ink-color);
+    box-shadow: 10px 10px 0 var(--ink-color);
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    min-width: 300px;
+}
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Глубокий темный цвет, чуть мягче чистого черного */
+    background: #1a1a1a; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease-in-out;
+}
+
+.loader-content {
+    text-align: center;
+    /* Шрифт, который тебе нравится для Solaris */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
+
+.loader-title {
+    font-size: 3.5rem;
+    letter-spacing: 12px;
+    margin-bottom: 10px;
+    /* Светло-серый текст, чтобы не слепил */
+    color: #e0e0e0; 
+    text-shadow: 0 0 15px rgba(231, 76, 60, 0.4); /* Мягкое свечение Алого пламени */
+}
+
+.loader-art {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+.loader-bar-container {
+    width: 280px;
+    height: 6px;
+    background: #333; /* Фон полоски */
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+    border: 1px solid #444;
+}
+
+.loader-fill {
+    width: 0%;
+    height: 100%;
+    /* Градиент от оранжевого к красному (эффект пламени) */
+    background: linear-gradient(90deg, #f1c40f, #e74c3c); 
+    box-shadow: 0 0 10px #e74c3c;
+    transition: width 0.4s ease;
+}
+
+#loader-status {
+    color: #888;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Эффект плавного исчезновения */
+.loader-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#achievement-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000; /* Выше экрана загрузки */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* Чтобы не мешали кликать по игре */
+}
+
+.achievement-toast {
+    background: #f1c40f; /* Желтый */
+    color: #000;
+    padding: 12px 20px;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    min-width: 200px;
+    
+    /* Тот самый неоновый эффект */
+    box-shadow: 0 0 15px #f1c40f, 0 0 30px rgba(241, 196, 15, 0.4);
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    /* Анимация появления справа */
+    animation: slideInAchievement 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideInAchievement {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.achievement-toast.fade-out {
+    animation: fadeOutAchievement 0.5s forwards;
+}
+
+@keyframes fadeOutAchievement {
+    to {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+}
+
+/* Стиль для выбранного слота */
+.inv-slot.selected-slot {
+    border: 2px solid #f1c40f !important; /* Желтый неон */
+    box-shadow: 0 0 15px #f1c40f;
+    background: rgba(241, 196, 15, 0.2);
+    transform: scale(1.05);
+}
+
+/* Эффект при наведении */
+.inv-slot:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #777;
+}
+
+/* Пустой слот */
+.inv-slot.empty {
+    opacity: 0.5;
+    border-style: dashed;
+}
+
+/* Стиль для выбранного слота в инвентаре */
+.slot.selected-slot {
+    border: 2px solid #f1c40f !important; /* Насыщенный желтый */
+    box-shadow: 0 0 15px #f1c40f, 0 0 5px #fff inset; /* Внешнее и внутреннее свечение */
+    background: rgba(241, 196, 15, 0.2) !important; /* Легкая желтая заливка */
+    transform: scale(1.05); /* Слот чуть-чуть увеличивается */
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+/* Добавим немного стиля самим слотам, если его нет */
+.slot {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.slot:hover:not(.selected-slot) {
+    border-color: #aaa;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pet-wrapper {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#pet-img {
+    max-width: 80%;
+    height: auto;
+    /* Используем переменную --glow-color, если её нет — будет красным по умолчанию */
+    filter: drop-shadow(0 0 20px var(--glow-color, rgba(231, 76, 60, 0.5))); 
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+#pet-img:hover {
+    transform: scale(1.05); /* Немного увеличивается при наведении */
+}
+
+/* Уведомление о новом уровне */
+.level-up-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px); /* Спрятано выше экрана */
+    background: #f1c40f; /* Ярко-желтый цвет */
+    color: #000;
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: 3px solid #000;
+    font-weight: 900;
+    font-size: 24px;
+    z-index: 9999;
+    box-shadow: 0 0 25px rgba(241, 196, 15, 0.8), inset 0 0 10px #fff;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.level-up-toast.show {
+    transform: translateX(-50%) translateY(0); /* Появляется */
+    opacity: 1;
+}
+
+.level-up-toast .star {
+    font-size: 28px;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+/* ===== ПАНЕЛЬ БОНУСОВ ЭКИПИРОВКИ ===== */
+.equip-bonus-panel {
+    min-width: 130px;
+    background: var(--panel-bg);
+    border: 2px solid var(--ink-color);
+    padding: 12px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.bonus-line {
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 5px;
+    font-family: 'Courier New', monospace;
+    font-weight: 900;
+}
+
+.bonus-line span { font-weight: 900; }
+
+.bonus-pwr  span { color: #e74c3c; }
+.bonus-def  span { color: #3498db; }
+.bonus-luck span { color: #2ecc71; }
+
+.bonus-empty {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    font-style: italic;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* ===== СИСТЕМА ЭКИПИРОВКИ ===== */
+.equip-slot.equipped {
+    border-style: solid;
+    border-color: #f1c40f;
+    background: rgba(241,196,15,0.15);
+    cursor: pointer;
+    font-size: 0.6rem;
+}
+
+.equip-slot.equipped:hover {
+    background: rgba(241,196,15,0.3);
+    box-shadow: 0 0 10px #f1c40f;
+}
+
+.item-tooltip {
+    position: fixed;
+    background: var(--panel-bg);
+    border: 2px solid var(--ink-color);
+    box-shadow: 4px 4px 0 var(--ink-color);
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 900;
+    color: var(--text-color);
+    pointer-events: none;
+    z-index: 99999;
+    white-space: nowrap;
+    backdrop-filter: blur(5px);
+}
+
+.item-tooltip .tooltip-slot { opacity: 0.7; margin-bottom: 4px; font-size: 0.65rem; }
+.item-tooltip .tooltip-bonus { color: #2ecc71; }
+
+/* Обновленные стили корзины */
+.trash-slot {
+    width: 35px !important;   /* Чуть меньше обычного слота */
+    height: 35px !important;
+    min-width: 35px !important;
+    font-size: 1.1rem !important;
+    margin: 0 !important;
+    border: 2px dashed #e74c3c !important; /* Пунктир, как зона удаления */
+    background: rgba(231, 76, 60, 0.05) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.trash-slot:hover {
+    background: rgba(231, 76, 60, 0.2) !important;
+    border-style: solid !important;
+}
+
+/* Пульсация только когда предмет выбран */
+.trash-active {
+    animation: trash-pulse 1s infinite;
+    background: rgba(231, 76, 60, 0.15) !important;
+    border-style: solid !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+@keyframes trash-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 5px rgba(231, 76, 60, 0.2); }
+    50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
+    100% { transform: scale(1); box-shadow: 0 0 5px rgba(231, 76, 60, 0.2); }
+}

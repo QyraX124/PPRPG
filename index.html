@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPRPG: Solaris Origins</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dungeon.css">
+    <!-- Discord Embedded App SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@latest/output/index.min.js"></script>
+    <script>
+        // Инициализация Discord SDK
+        async function initDiscord() {
+            try {
+                const { DiscordSDK } = window.DiscordEmbeddedAppSDK || {};
+                if (!DiscordSDK) return; // Если не в Discord — просто работаем как обычно
+
+                const CLIENT_ID = window.DISCORD_CLIENT_ID || '';
+                if (!CLIENT_ID) return;
+
+                const discordSdk = new DiscordSDK(CLIENT_ID);
+                await discordSdk.ready();
+                console.log('Discord SDK ready!');
+            } catch (e) {
+                console.log('Not in Discord or SDK error:', e);
+                // Игра продолжает работать нормально в браузере
+            }
+        }
+        initDiscord();
+    </script>
+</head>
+<body>
+    <div id="screen-loader" class="loader-overlay">
+    <div class="loader-content">
+        <h1 class="loader-title">SOLARIS</h1>
+        <div class="loader-art">✨</div>
+        <div class="loader-bar-container">
+            <div id="loader-fill" class="loader-fill"></div>
+        </div>
+        <p id="loader-status">Загрузка воображения...</p>
+    </div>
+</div>
+
+    <div id="game-container" class="notebook-page">
+        <section id="screen-selection" class="screen">
+            <h1 class="handwritten title" id="txt-main-title">Первые Наброски</h1>
+            <div class="selection-grid">
+                <div class="card" onclick="initPet('pet_dragon', 'assets/baby_dragon.png')">
+                    <h3 id="choice-1">Дракон (Танк)</h3>
+                </div>
+                <div class="card" onclick="initPet('pet_unicorn', 'assets/unicorn_healer.png')">
+                    <h3 id="choice-2">Единорог (Хил)</h3>
+                </div>
+                <div class="card" onclick="initPet('pet_cat', 'assets/cat_archer.png')">
+                    <h3 id="choice-3">Кот-лучник (ДД)</h3>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-main" class="screen hidden layout-3-col">
+            <aside class="panel left-panel">
+                <h3 class="handwritten" id="txt-actions">Действия</h3>
+                <button class="sketch-btn" onclick="train()" id="btn-train">🏋️ Тренировка</button>
+                <button class="sketch-btn" onclick="openDungeonSelection()" id="btn-dungeon">🗺️ Данж</button>
+                <button class="sketch-btn" onclick="rest()" id="btn-rest">💤 Отдых</button>
+                <button class="sketch-btn" onclick="openCraft()" id="btn-craft">⚒️ Крафт</button>
+                <button class="sketch-btn" onclick="toggleAchievements()" id="btn-achievements">🏆 Достижения</button>
+            </aside>
+
+            <main class="center-panel">
+                <h2 id="pet-name" class="handwritten">Имя</h2>
+                <div class="pet-wrapper">
+                    <img id="pet-img" src="" class="sketch" alt="Питомец">
+                </div>
+                <div class="bars">
+                    <p>❤️ HP: <span id="hp">100</span> / <span id="max-hp">100</span></p>
+                    <p>⚡ <span id="txt-energy-label">Энергия</span>: <span id="energy">50</span> / 50</p>
+                </div>
+            </main>
+
+            <aside class="panel right-panel">
+                <h3 class="handwritten" id="txt-hero">Герой</h3>
+                <div class="stats-mini">
+                    <p><span id="txt-lvl">Ур</span>: <span id="lvl">1</span></p>
+                    <p>🌟 <span id="txt-xp">Опыт</span>: <span id="xp">0</span> / <span id="max-xp">100</span></p>
+                    <p>⚔️ <span id="txt-pwr">Сила</span>: <span id="pwr">12</span></p>
+                    <p>🛡️ <span id="txt-def">Защита</span>: <span id="def">5</span></p>
+                    <p>🍀 <span id="txt-luck">Удача</span>: <span id="luck">10</span>%</p>
+                    <hr class="sketch-line">
+                    <p>✒️ <span id="txt-inks">Чернила</span>: <span id="inks">0</span></p>
+                </div>
+                <button class="sketch-btn mt-10" onclick="toggleInventory()" id="btn-inv">🎒 Рюкзак</button>
+                <button class="sketch-btn" onclick="toggleTheme()" id="btn-theme">🌓 Тема</button>
+                <div class="lang-switcher">
+                    <button class="sketch-btn mini" onclick="changeLanguage('ru')">RU</button>
+                    <button class="sketch-btn mini" onclick="changeLanguage('en')">EN</button>
+                </div>
+            </aside>
+        </section>
+
+        <div id="achievements-modal" class="draggable-window hidden">
+            <div id="achievements-header" class="window-header">
+                <span id="txt-ach-title">🏆 Достижения</span>
+                <button class="close-btn" onclick="toggleAchievements()">X</button>
+            </div>
+            <div class="window-content">
+                <div id="achievements-list"></div>
+            </div>
+        </div>
+
+        <div id="inventory-modal" class="draggable-window hidden">
+            <div id="inventory-header" class="window-header">
+                <span id="txt-inv-title">🎒 Инвентарь</span>
+                <button class="close-btn" onclick="toggleInventory()">X</button>
+            </div>
+            <div class="window-content inv-container">
+                <div class="inv-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <p class="handwritten small" id="txt-inv-items" style="margin: 0;">Предметы</p>
+                        <div id="trash-bin" class="slot trash-slot" onclick="throwItemToTrash()" style="width: 40px; height: 40px; font-size: 1.2rem;">🗑️</div>
+                    </div>
+                    <div class="items-grid" id="inv-slots"></div>
+                </div>
+                <div class="inv-section">
+                    <p class="handwritten small" id="txt-inv-equip">Экипировка</p>
+                    <div class="equip-grid">
+                        <div class="slot equip-slot" id="txt-slot-head">Голова</div>
+                        <div class="slot equip-slot" id="txt-slot-body">Тело</div>
+                        <div class="slot equip-slot" id="txt-slot-legs">Ноги</div>
+                        <div class="slot equip-slot" id="txt-slot-ring">Кольцо</div>
+                        <div class="slot equip-slot" id="txt-slot-amulet">Амулет</div>
+                        <div class="slot equip-slot" id="txt-slot-cloak">Плащ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div id="loot-modal" class="draggable-window hidden">
+        <div id="loot-header" class="window-header">
+            <span id="txt-loot-title">🎁 Награды</span>
+            <button class="close-btn" onclick="closeLootModal()">X</button>
+        </div>
+        <div class="window-content center-panel" style="text-align: center;">
+            <h2 id="loot-title-text" class="handwritten">Подземелье зачищено!</h2>
+            <p class="handwritten" style="font-size: 1.5rem; margin-top: 10px;">
+                ✒️ Чернила: <span id="loot-inks-val" style="color: var(--ink-color);">+0</span>
+            </p>
+            
+            <div id="loot-item-box" class="hidden" style="margin-top: 20px;">
+                <p class="handwritten small">Найден предмет:</p>
+                <div class="slot" style="margin: 0 auto; width: 100px; height: 100px; font-size: 1.2rem; border-color: #f1c40f; background: rgba(241,196,15,0.1);" id="loot-item-name">
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <section id="screen-dungeon-selection" class="screen hidden">
+        <button class="exit-btn" onclick="showScreen('screen-main')">
+        <span id="txt-dungeon-back">Назад</span>
+        </button>
+    
+         <div class="lobby-container">
+            <h1 id="dungeon-selection-title">Доступные локации</h1>
+        
+                <div class="dungeon-carousel" id="dungeon-list">
+                </div>
+        </div>
+        </section>
+
+        <div id="dungeon-loader" class="loader-overlay hidden">
+    <div class="loader-content">
+        <h2 id="dungeon-load-title" class="loader-title">ВХОД...</h2>
+        <div class="loader-art">📔</div>
+        <div class="loader-bar-container">
+            <div id="dungeon-load-fill" class="loader-fill"></div>
+        </div>
+        <p id="dungeon-load-status">Набросок карты...</p>
+    </div>
+</div>
+
+<section id="screen-adventure" class="screen hidden">
+    <div class="adventure-container">
+        <div class="adv-header">
+            <h2 id="adv-dungeon-name" class="handwritten title">Название локации</h2>
+            <p id="adv-room-counter" class="handwritten small">Комната: 1 / 5</p>
+        </div>
+
+        <div class="battle-arena">
+    <div class="arena-side player-side">
+        <div id="bp-container" class="bp-container"></div>
+        <img id="pet-visual" src="" class="unit-img pet-sketch" alt="Питомец">
+        
+        <div class="hp-bar-container" id="hp-bar-container">
+            <div id="player-hp-fill" class="hp-fill player-hp"></div>
+        </div>
+        <span class="unit-label" id="pet-name-label">Питомец</span>
+    </div>
+
+    <div class="arena-vs">VS</div>
+
+    <div class="arena-side enemy-side">
+        <img id="event-visual" src="assets/monster_ink.png" class="unit-img monster-sketch" alt="Враг">
+        
+        <div id="enemy-hp-bar" class="hp-bar-container">
+            <div id="enemy-hp-fill" class="hp-fill enemy-hp"></div>
+        </div>
+        <span class="unit-label" id="enemy-name-label">Враг</span>
+    </div>
+</div>
+
+        <p id="adv-description" class="handwritten">Вы вошли в комнату...</p>
+
+        <div class="battle-actions">
+            <div id="battle-controls" class="action-grid hidden">
+                <button class="sketch-btn attack" id="btn-attack" onclick="playerAttack()">⚔️ Атака</button>
+                <button id="btn-skill" class="sketch-btn skill" onclick="useSkill()">✨ Навык</button>
+                <button class="sketch-btn flee" id="btn-flee" onclick="showScreen('screen-dungeon-selection')">🏃 Сбежать</button>
+            </div>
+
+            <div id="adv-controls" class="hidden">
+                <button id="btn-next-room" class="sketch-btn next" onclick="nextRoom()">Идти дальше ➡️</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+    </div>
+
+    </div><!-- /game-container -->
+
+    <div id="craft-modal" class="draggable-window hidden">
+    <div id="craft-header" class="window-header">
+        <span id="txt-craft-title">⚒️ Верстак</span>
+        <button class="close-btn" onclick="closeCraft()">X</button>
+    </div>
+    <div class="window-content">
+        <div id="craft-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
+    </div>
+</div>
+
+    <div id="achievement-container"></div>
+
+    <script src="lang.js"></script>
+
+    <script src="script.js"></script>
+    <script src="dungeon.js"></script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+/* dungeon.css */
+
+.lobby-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: var(--panel-bg); /* Чтобы фон был как в тетрадке */
+}
+
+.dungeon-carousel {
+    display: flex;
+    gap: 60px; /* Расстояние между кругами */
+    padding: 50px 20vw; /* Большие отступы по бокам для центровки */
+    width: 100%;
+    overflow-x: scroll; /* Включаем прокрутку */
+    scroll-behavior: smooth;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Прячем полосу прокрутки, чтобы было красиво */
+.dungeon-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.dungeon-item {
+    flex: 0 0 300px; /* ЗАПРЕЩАЕМ сжиматься. 300px — жесткая ширина */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dungeon-item:hover {
+    transform: scale(1.1);
+}
+
+.dungeon-circle {
+    width: 180px;
+    height: 180px;
+    border: 6px solid var(--ink-color);
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 0 var(--ink-color);
+}
+
+/* Информация под кругом */
+.dungeon-info {
+    text-align: center;
+    background: var(--panel-bg);
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid var(--ink-color);
+    width: 100%;
+}
+
+.dungeon-info h3 {
+    margin: 0 0 10px 0;
+    font-family: 'Handwritten', cursive;
+}
+
+.dungeon-stats {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+@media (min-width: 1200px) {
+    .dungeon-carousel {
+        justify-content: center;
+    }
+}
+
+.exit-btn {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    padding: 10px 25px;
+    background: white;
+    border: 3px solid var(--ink-color);
+    border-radius: 15px 5px 12px 4px; /* Неровные края для эффекта рисунка */
+    font-family: 'Handwritten', cursive;
+    font-size: 1.2rem;
+    color: var(--ink-color);
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.2s ease;
+    box-shadow: 4px 4px 0px var(--ink-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.exit-btn span {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Эффект наведения — кнопка чуть приподнимается */
+.exit-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--ink-color);
+    background: #fdfdfd;
+}
+
+/* Эффект нажатия — кнопка «вдавливается» */
+.exit-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0px var(--ink-color);
+}
+
+.loader-overlay.hidden {
+    display: none;
+}
+
+#dungeon-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--panel-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+#dungeon-load-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--ink-color);
+    transition: width 0.2s ease;
+}
+
+.adventure-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.event-box {
+    background: var(--panel-bg);
+    border: 2px dashed var(--ink-color);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 20px 0;
+    width: 80%;
+    max-width: 400px;
+}
+
+.event-visual {
+    font-size: 5rem; /* Огромный эмодзи монстра */
+    margin-bottom: 20px;
+    animation: breathe 2s infinite ease-in-out; /* Легкая анимация дыхания */
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.hp-bar-container {
+    width: 100%;
+    height: 15px;
+    background: rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--ink-color);
+    border-radius: 10px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    background: #ff4757; /* Красная полоска */
+    width: 100%;
+    transition: width 0.3s ease;
+}
+
+.adventure-controls, .battle-controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Скрываем элементы, когда они не нужны */
+.hidden { display: none !important; }
+
+.battle-arena {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 600px;
+    margin: 40px 0;
+}
+
+.arena-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40%;
+    position: relative; /* <--- ДОБАВЬ ЭТУ СТРОКУ */
+}
+
+.unit-visual {
+    font-size: 5rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(2px 4px 0px rgba(0,0,0,0.1));
+}
+
+.unit-label {
+    font-family: 'Handwritten', cursive;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+.arena-vs {
+    font-family: 'Handwritten', cursive;
+    font-size: 2rem;
+    opacity: 0.5;
+}
+
+/* Цвета полосок */
+.player-hp { background: #2ecc71 !important; } /* Зеленый */
+.enemy-hp { background: #e74c3c !important; }  /* Красный */
+
+/* Сетка кнопок внизу */
+.battle-actions {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.action-grid .flee {
+    grid-column: span 2; /* Кнопка сбежать на всю ширину под ними */
+    background: #eee;
+}
+
+.sketch-btn.skill { border-color: #9b59b6; color: #8e44ad; }
+
+/* Новые стили для картинок на арене */
+.unit-img {
+    max-height: 150px; /* Ограничиваем высоту */
+    width: auto;
+    filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.15)); /* Тетральный эффект тени */
+    margin-bottom: 10px;
+}
+
+/* Свечение для питомца (как на главном экране) */
+.pet-sketch {
+    filter: drop-shadow(0 0 15px var(--glow-color, rgba(231, 76, 60, 0.4)));
+}
+
+/* ИСПРАВЛЕНИЕ: Кнопка Сбежать в темной теме */
+.action-grid .flee {
+    grid-column: span 2;
+    /* Убираем жесткий белый фон */
+    background: rgba(255, 255, 255, 0.1) !important; 
+    border-color: var(--ink-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* Чуть приподнимем заголовок VS */
+.arena-vs {
+    font-size: 2.5rem;
+    margin-top: -50px;
+}
+
+.monster-sketch {
+    width: 150px; /* Размер обычного моба */
+    height: auto;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); /* Чтобы выделялся на бумаге */
+    transition: transform 0.2s ease;
+}
+
+/* Эффект получения урона */
+.monster-hit {
+    animation: shake 0.2s;
+    filter: brightness(0.5) sepia(1) saturate(5) hue-rotate(-50deg);
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    20% { transform: translate(-3px, 0px) rotate(-1deg); }
+    40% { transform: translate(3px, 2px) rotate(1deg); }
+    60% { transform: translate(-1px, -1px) rotate(0deg); }
+    100% { transform: translate(1px, 1px) rotate(0deg); }
+}
+.shake {
+    animation: shake 0.5s;
+}
+
+/* dungeon.css */
+
+/* Контейнер для очков */
+.bp-container {
+    position: absolute;
+    left: -30px; /* Сдвигаем влево от питомца (отрегулируй, если нужно) */
+    top: 50%;
+    transform: translateY(-50%); /* Центрируем по вертикали */
+    display: flex;
+    flex-direction: column-reverse; /* Ромбики будут заполняться снизу вверх */
+    gap: 8px; /* Расстояние между ромбиками */
+}
+
+/* Пустой ромбик */
+.bp-diamond {
+    width: 14px;
+    height: 14px;
+    background-color: transparent;
+    border: 2px solid var(--ink-color, #003366);
+    transform: rotate(45deg); /* Поворачиваем квадрат на 45 градусов, чтобы получить ромб */
+    transition: all 0.3s ease;
+    opacity: 0.5; /* Слегка прозрачные, когда пустые */
+}
+
+/* Заполненный ромбик */
+.bp-diamond.filled {
+    background-color: #f1c40f; /* Золотой цвет */
+    border-color: #f1c40f;
+    opacity: 1;
+    box-shadow: 0 0 8px #f1c40f; /* Легкое свечение */
+}
+
+/* В темной теме можно сделать свечение ярче */
+body.dark-mode .bp-diamond.filled {
+    box-shadow: 0 0 12px #f1c40f, 0 0 5px #fff inset;
+}
