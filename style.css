@@ -1,3 +1,16 @@
+* {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation; /* Улучшает отзывчивость кликов */
+}
+
+/* Разрешаем клики для всех интерактивных элементов */
+button, .slot, .card, .dungeon-item, .close-btn, #trash-bin {
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
 :root {
     --bg-image: url('assets/bg.jpg'); 
     --grid-color: rgba(0, 51, 102, 0.15); 
