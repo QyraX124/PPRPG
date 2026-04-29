@@ -7,25 +7,46 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dungeon.css">
     <!-- Discord Embedded App SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@latest/output/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@1.3.0/output/index.min.js"></script>
     <script>
-        // Инициализация Discord SDK
+        const DISCORD_CLIENT_ID = '1496747249391108157';
+
         async function initDiscord() {
             try {
-                const { DiscordSDK } = window.DiscordEmbeddedAppSDK || {};
-                if (!DiscordSDK) return; // Если не в Discord — просто работаем как обычно
+                // Проверяем что мы внутри Discord iframe
+                if (!window.DiscordSDK) {
+                    console.log('Not in Discord, running normally');
+                    return;
+                }
 
-                const CLIENT_ID = window.DISCORD_CLIENT_ID || '';
-                if (!CLIENT_ID) return;
+                const discordSdk = new window.DiscordSDK(DISCORD_CLIENT_ID);
 
-                const discordSdk = new DiscordSDK(CLIENT_ID);
+                // Шаг 1: ждём готовности
                 await discordSdk.ready();
-                console.log('Discord SDK ready!');
+                console.log('Discord SDK ready');
+
+                // Шаг 2: ОБЯЗАТЕЛЬНАЯ авторизация — без неё iframe блокирует клики
+                const { code } = await discordSdk.commands.authorize({
+                    client_id: DISCORD_CLIENT_ID,
+                    response_type: 'code',
+                    state: '',
+                    prompt: 'none',
+                    scope: ['identify'],
+                });
+                console.log('Discord authorized, code:', code);
+
+                // Шаг 3: подписываемся на события (опционально)
+                await discordSdk.subscribe('READY', () => {
+                    console.log('Discord fully ready, clicks should work now');
+                });
+
             } catch (e) {
-                console.log('Not in Discord or SDK error:', e);
-                // Игра продолжает работать нормально в браузере
+                // Если ошибка — игра всё равно работает нормально
+                console.log('Discord init error (game still works):', e.message);
             }
         }
+
+        // Запускаем сразу, не ждём загрузки страницы
         initDiscord();
     </script>
 </head>
