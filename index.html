@@ -9,6 +9,7 @@
     <!-- Discord Embedded App SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@1.3.0/output/index.min.js"></script>
     <script>
+        // !! ЗАМЕНИ НА СВОЙ CLIENT ID ИЗ DISCORD DEVELOPER PORTAL !!
         const DISCORD_CLIENT_ID = '1496747249391108157';
 
         async function initDiscord() {
@@ -66,13 +67,13 @@
         <section id="screen-selection" class="screen">
             <h1 class="handwritten title" id="txt-main-title">Первые Наброски</h1>
             <div class="selection-grid">
-                <div class="card" onclick="initPet('pet_dragon', 'assets/baby_dragon.png')">
+                <div class="card" id="card-dragon">
                     <h3 id="choice-1">Дракон (Танк)</h3>
                 </div>
-                <div class="card" onclick="initPet('pet_unicorn', 'assets/unicorn_healer.png')">
+                <div class="card" id="card-unicorn">
                     <h3 id="choice-2">Единорог (Хил)</h3>
                 </div>
-                <div class="card" onclick="initPet('pet_cat', 'assets/cat_archer.png')">
+                <div class="card" id="card-cat">
                     <h3 id="choice-3">Кот-лучник (ДД)</h3>
                 </div>
             </div>
@@ -81,11 +82,11 @@
         <section id="screen-main" class="screen hidden layout-3-col">
             <aside class="panel left-panel">
                 <h3 class="handwritten" id="txt-actions">Действия</h3>
-                <button class="sketch-btn" onclick="train()" id="btn-train">🏋️ Тренировка</button>
-                <button class="sketch-btn" onclick="openDungeonSelection()" id="btn-dungeon">🗺️ Данж</button>
-                <button class="sketch-btn" onclick="rest()" id="btn-rest">💤 Отдых</button>
-                <button class="sketch-btn" onclick="openCraft()" id="btn-craft">⚒️ Крафт</button>
-                <button class="sketch-btn" onclick="toggleAchievements()" id="btn-achievements">🏆 Достижения</button>
+                <button class="sketch-btn" id="btn-train">🏋️ Тренировка</button>
+                <button class="sketch-btn" id="btn-dungeon">🗺️ Данж</button>
+                <button class="sketch-btn" id="btn-rest">💤 Отдых</button>
+                <button class="sketch-btn" id="btn-craft">⚒️ Крафт</button>
+                <button class="sketch-btn" id="btn-achievements">🏆 Достижения</button>
             </aside>
 
             <main class="center-panel">
@@ -110,11 +111,11 @@
                     <hr class="sketch-line">
                     <p>✒️ <span id="txt-inks">Чернила</span>: <span id="inks">0</span></p>
                 </div>
-                <button class="sketch-btn mt-10" onclick="toggleInventory()" id="btn-inv">🎒 Рюкзак</button>
-                <button class="sketch-btn" onclick="toggleTheme()" id="btn-theme">🌓 Тема</button>
+                <button class="sketch-btn mt-10" id="btn-inv">🎒 Рюкзак</button>
+                <button class="sketch-btn" id="btn-theme">🌓 Тема</button>
                 <div class="lang-switcher">
-                    <button class="sketch-btn mini" onclick="changeLanguage('ru')">RU</button>
-                    <button class="sketch-btn mini" onclick="changeLanguage('en')">EN</button>
+                    <button class="sketch-btn mini" id="btn-lang-ru">RU</button>
+                    <button class="sketch-btn mini" id="btn-lang-en">EN</button>
                 </div>
             </aside>
         </section>
@@ -122,7 +123,7 @@
         <div id="achievements-modal" class="draggable-window hidden">
             <div id="achievements-header" class="window-header">
                 <span id="txt-ach-title">🏆 Достижения</span>
-                <button class="close-btn" onclick="toggleAchievements()">X</button>
+                <button class="close-btn" id="close-ach">X</button>
             </div>
             <div class="window-content">
                 <div id="achievements-list"></div>
@@ -132,13 +133,13 @@
         <div id="inventory-modal" class="draggable-window hidden">
             <div id="inventory-header" class="window-header">
                 <span id="txt-inv-title">🎒 Инвентарь</span>
-                <button class="close-btn" onclick="toggleInventory()">X</button>
+                <button class="close-btn" id="close-inv">X</button>
             </div>
             <div class="window-content inv-container">
                 <div class="inv-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <p class="handwritten small" id="txt-inv-items" style="margin: 0;">Предметы</p>
-                        <div id="trash-bin" class="slot trash-slot" onclick="throwItemToTrash()" style="width: 40px; height: 40px; font-size: 1.2rem;">🗑️</div>
+                        <div id="trash-bin" class="slot trash-slot" id="trash-bin-btn" style="width: 40px; height: 40px; font-size: 1.2rem;">🗑️</div>
                     </div>
                     <div class="items-grid" id="inv-slots"></div>
                 </div>
@@ -159,7 +160,7 @@
     <div id="loot-modal" class="draggable-window hidden">
         <div id="loot-header" class="window-header">
             <span id="txt-loot-title">🎁 Награды</span>
-            <button class="close-btn" onclick="closeLootModal()">X</button>
+            <button class="close-btn" id="close-loot">X</button>
         </div>
         <div class="window-content center-panel" style="text-align: center;">
             <h2 id="loot-title-text" class="handwritten">Подземелье зачищено!</h2>
@@ -176,7 +177,7 @@
     </div>
 
         <section id="screen-dungeon-selection" class="screen hidden">
-        <button class="exit-btn" onclick="showScreen('screen-main')">
+        <button class="exit-btn" id="btn-dungeon-back-btn">
         <span id="txt-dungeon-back">Назад</span>
         </button>
     
@@ -233,13 +234,13 @@
 
         <div class="battle-actions">
             <div id="battle-controls" class="action-grid hidden">
-                <button class="sketch-btn attack" id="btn-attack" onclick="playerAttack()">⚔️ Атака</button>
-                <button id="btn-skill" class="sketch-btn skill" onclick="useSkill()">✨ Навык</button>
-                <button class="sketch-btn flee" id="btn-flee" onclick="showScreen('screen-dungeon-selection')">🏃 Сбежать</button>
+                <button class="sketch-btn attack" id="btn-attack">⚔️ Атака</button>
+                <button id="btn-skill" class="sketch-btn skill" >✨ Навык</button>
+                <button class="sketch-btn flee" id="btn-flee">🏃 Сбежать</button>
             </div>
 
             <div id="adv-controls" class="hidden">
-                <button id="btn-next-room" class="sketch-btn next" onclick="nextRoom()">Идти дальше ➡️</button>
+                <button id="btn-next-room" class="sketch-btn next" >Идти дальше ➡️</button>
             </div>
         </div>
     </div>
@@ -252,7 +253,7 @@
     <div id="craft-modal" class="draggable-window hidden">
     <div id="craft-header" class="window-header">
         <span id="txt-craft-title">⚒️ Верстак</span>
-        <button class="close-btn" onclick="closeCraft()">X</button>
+        <button class="close-btn" id="close-craft">X</button>
     </div>
     <div class="window-content">
         <div id="craft-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
@@ -265,5 +266,51 @@
 
     <script src="script.js"></script>
     <script src="dungeon.js"></script>
+
+    <script>
+    // CSP fix — все события через addEventListener вместо onclick
+    document.addEventListener('DOMContentLoaded', function() {
+        const $ = id => document.getElementById(id);
+
+        // Выбор питомца
+        const cardDragon = document.getElementById('card-dragon');
+        if (cardDragon) cardDragon.addEventListener('click', () => initPet('pet_dragon', 'assets/baby_dragon.png'));
+        const cardUnicorn = document.getElementById('card-unicorn');
+        if (cardUnicorn) cardUnicorn.addEventListener('click', () => initPet('pet_unicorn', 'assets/unicorn_healer.png'));
+        const cardCat = document.getElementById('card-cat');
+        if (cardCat) cardCat.addEventListener('click', () => initPet('pet_cat', 'assets/cat_archer.png'));
+
+        // Главный экран
+        const btnTrain = $('btn-train'); if (btnTrain) btnTrain.addEventListener('click', train);
+        const btnDungeon = $('btn-dungeon'); if (btnDungeon) btnDungeon.addEventListener('click', openDungeonSelection);
+        const btnRest = $('btn-rest'); if (btnRest) btnRest.addEventListener('click', rest);
+        const btnCraft = $('btn-craft'); if (btnCraft) btnCraft.addEventListener('click', openCraft);
+        const btnAch = $('btn-achievements'); if (btnAch) btnAch.addEventListener('click', toggleAchievements);
+        const btnInv = $('btn-inv'); if (btnInv) btnInv.addEventListener('click', toggleInventory);
+        const btnTheme = $('btn-theme'); if (btnTheme) btnTheme.addEventListener('click', toggleTheme);
+
+        // Языки
+        const btnRu = $('btn-lang-ru'); if (btnRu) btnRu.addEventListener('click', () => changeLanguage('ru'));
+        const btnEn = $('btn-lang-en'); if (btnEn) btnEn.addEventListener('click', () => changeLanguage('en'));
+
+        // Закрытие модалок
+        const closeAch = $('close-ach'); if (closeAch) closeAch.addEventListener('click', toggleAchievements);
+        const closeInv = $('close-inv'); if (closeInv) closeInv.addEventListener('click', toggleInventory);
+        const closeLoot = $('close-loot'); if (closeLoot) closeLoot.addEventListener('click', closeLootModal);
+        const closeCraft = $('close-craft'); if (closeCraft) closeCraft.addEventListener('click', () => { if(typeof window.closeCraft === 'function') window.closeCraft(); });
+
+        // Корзина
+        const trashBtn = $('trash-bin-btn'); if (trashBtn) trashBtn.addEventListener('click', throwItemToTrash);
+
+        // Назад из данжа
+        const backBtn = $('btn-dungeon-back-btn'); if (backBtn) backBtn.addEventListener('click', () => showScreen('screen-main'));
+
+        // Боевые кнопки
+        const btnAttack = $('btn-attack'); if (btnAttack) btnAttack.addEventListener('click', playerAttack);
+        const btnSkill = $('btn-skill'); if (btnSkill) btnSkill.addEventListener('click', useSkill);
+        const btnFlee = $('btn-flee'); if (btnFlee) btnFlee.addEventListener('click', () => showScreen('screen-dungeon-selection'));
+        const btnNext = $('btn-next-room'); if (btnNext) btnNext.addEventListener('click', nextRoom);
+    });
+    </script>
 </body>
 </html>
